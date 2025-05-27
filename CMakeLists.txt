@@ -33,3 +33,23 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     PUGIXML_HEADER_ONLY
 )
+
+# ---- libzip ------------------------------------------------------------
+# 尝试优先用 Config 模式；找不到时回退 pkg-config
+find_package(LibZip QUIET CONFIG)
+if (NOT LibZip_FOUND)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(LIBZIP REQUIRED libzip)
+
+    add_library(libzip::zip UNKNOWN IMPORTED)
+    set_target_properties(libzip::zip PROPERTIES
+        IMPORTED_LOCATION "${LIBZIP_LINK_LIBRARIES}"
+        INTERFACE_INCLUDE_DIRECTORIES "${LIBZIP_INCLUDE_DIRS}"
+    )
+endif()
+# ------------------------------------------------------------------------
+
+add_executable(unzip_test
+    test/unzip_all_libzip.cpp
+)
+target_link_libraries(unzip_test PRIVATE libzip::zip)
