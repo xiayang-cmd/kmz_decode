@@ -12,12 +12,14 @@ find_package(Protobuf REQUIRED)
 # 可执行文件
 add_executable(${PROJECT_NAME}
     main.cpp
+    wpml_parser.cpp
     third_party/protobuf/TelemetryDataBuf-new.pb.cpp
 )
 
 # 头文件路径
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${Protobuf_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/pugixml
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party/protobuf
 )
