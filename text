@@ -1,0 +1,109 @@
+// -------------------------
+// 航线数据 (PlanLineData)
+// -------------------------
+message PlanLineData{
+    // <wpml:missionConfig> → <wpml:finishAction>
+    uint32 finishedAction = 1;  
+
+    // <wpml:missionConfig> → <wpml:globalTransitionalSpeed>
+    float maxSpeed = 2;
+
+    // <Folder> → <wpml:autoFlightSpeed>
+    float autoSpeed = 3;
+
+    // <Folder> 下的多个 <Placemark>
+    repeated PointData points = 4;
+
+    // <wpml:missionConfig> → <wpml:exitOnRCLost> & <wpml:executeRCLostAction>
+    uint32 loseAction = 5;
+
+    // <wpml:missionConfig> → <wpml:globalRTHHeight>
+    uint32 homeHeight = 6;
+
+    // <wpml:missionConfig> → <wpml:flyToWaylineMode>
+    uint32 isSaveEnergyMode = 7;
+
+    // none
+    HangarPoint takePoint = 8;
+
+    // none
+    HangarPoint landPoint = 9;
+
+    // none
+    repeated PointData interests = 10;
+
+    // none
+    NormalModel normalModel = 11;
+
+    // none
+    SurroundModel surroundModel = 12;
+
+    // none
+    PointData takeOffPoint = 13;
+
+    // <wpml:missionConfig> → <wpml:takeOffSecurityHeight>
+    uint32 securityHeight = 14;
+
+    // <Folder> → <wpml:templateId>
+    uint32 templateId = 15;
+}
+
+
+// -------------------------
+// 航线点数据 (PointData)
+// -------------------------
+message PointData{
+    // <Placemark> → <Point> → <coordinates> (分割后第1项)
+    double lng = 1;
+
+    // <Placemark> → <Point> → <coordinates> (分割后第2项)
+    double lat = 2;
+
+    // <Placemark> → <wpml:executeHeight>
+    float height = 3;
+
+    // <Placemark> → <wpml:waypointSpeed>
+    float speed = 4;
+
+    // <Folder> → <wpml:actionGroup> (根据startIndex~endIndex是否包含此Placemark)
+    repeated PointAction actions = 5;
+
+    // <Placemark> → <wpml:waypointTurnParam> → <wpml:waypointTurnMode>
+    uint32 flightPathMode = 6;
+
+    // <Placemark> → <wpml:waypointTurnParam> → <wpml:waypointTurnDampingDist>
+    float dampingDistance = 7;
+
+    // none
+    uint32 safeGohomeFlag = 8;
+
+    // <Placemark> → <wpml:waypointHeadingParam> → <wpml:waypointHeadingMode>
+    uint32 headingMode = 9;
+
+    // <Placemark> → <wpml:waypointHeadingParam> → <wpml:waypointHeadingAngle>
+    float heading = 10;
+
+    // none
+    int32 interestIndex = 11;
+
+    // none
+    uint32 groupIndex = 12;
+}
+
+
+// -------------------------
+// 航点动作 (PointAction)
+// -------------------------
+message PointAction{
+    // <wpml:action> → <wpml:actionActuatorFunc>
+    uint32 type = 1;
+
+    // <wpml:action> → <wpml:actionActuatorFuncParam>
+    float param = 2;
+
+    // none
+    int32 waitTime = 3;
+
+    // none
+    string speakInfo = 4;
+}

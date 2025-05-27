@@ -1,0 +1,408 @@
+syntax = "proto3";
+option java_package = "com.tyjw.common.protos";
+option java_outer_classname ="TyjwDataPB";
+
+//下行遥测(0xA9)
+message TelemetryData{
+    double lng=1;//经度
+    double lat=2;//纬度
+    float altitude=3;//海拔高度(椭球高)(单位:米)[会受周围气压湿度等环境影响，数据差异及误差比较大]
+    float ultrasonic=4;//相对高度(单位:米)[飞行器距地面10米以下，此值为真实距地距离，大于10米时为距起飞点的相对高度]
+    float pitch=5;//俯仰角
+    float roll=6;//横滚角
+    float yaw=7;//偏航角
+    float airspeed=8;//空速(单位:米/秒)
+    float velocity=9;//地速(单位:米/秒)
+    uint64 timestamp=10;//时间戳
+    float ptpitch=11;//载荷俯仰角
+    float ptroll=12;//载荷横滚角
+    float ptyaw=13;//载荷航向角
+    float zoomfactor=14;//载荷当前倍数
+    string boxSn=15;//云盒子编号
+    string batteryPower=16;//电池电量,多个电池以下划线分割,如：80_60
+    uint32 satelliteCount=17;//卫星计数
+    uint64 taskId=18;//任务编号
+    double rtkLng=19;//rtk经度
+    double rtkLat=20;//rtk纬度
+    float rtkHFSL=21;//rtk海拔高度(平均海平面高度)(单位:米)   
+    uint32 rtkPositionInfo=22;//rtk状态(值为50时[rtk数据fix固定解]，rtk的经纬度及海拔高度值可用)
+    uint32 airFlyTimes=23;//当前架次飞行时长(单位:秒) [起飞->落地 视为一个架次]
+    float airFlyDistance=24;//当前架次飞行实际距离(单位:米)
+    string uavSn=25;//无人机编号
+    string uavModel=26;//无人机型号
+    float homeRange=27;//距降落点水平直线距离(单位:米)
+    uint32 flightMode=28;//飞行模式：1=手动控制模式，2=姿态模式，6=MODE_P_GPS，9=热点任务中，11=自动起飞中，12=降落中，14=航线中，15=返航中，17=虚拟摇杆控制中，33=强制降落中，41=解锁电机准备起飞中
+    float targetDistance=29;//距目标点或最后一个航点的实际距离(单位:米) [适用于打点飞行或航线飞行]
+    uint32 predictFlyTime=30;//距目标点或最后一个航点的预计剩余飞行时间(单位:秒)[适用于打点飞行或航线飞行]
+    float ultrasonicMax=31;//本架次最大相对高度值
+    float ultrasonicMin=32;//本架次最小相对高度值 
+    float xVelocity=33;//飞行器x轴速度(单位:米/秒)
+    float yVelocity=34;//飞行器y轴速度(单位:米/秒)
+    float zVelocity=35;//飞行器z轴速度(单位:米/秒)
+    string boxName=36;//云盒名称
+    uint32 predictFlyTimes=37;//预计剩余飞行时间(单位:秒)
+    uint32 predictGohomeBattery=38;//预计返航所需最小电量百分比
+}
+
+//飞行历史
+message TelemetryList{
+    repeated TelemetryData telemetryList = 1;
+}
+
+//信道质量(0x0C)
+message SignalInfo{
+   string mode=1; //入网模式:NR5G-SA,NR5G-NSA，LTE
+   string mcc=2; //NR5G-SA,NR5G-NSA,LTE
+   string mnc=3; //NR5G-SA,NR5G-NSA,LTE
+   string cellid=4; //NR5G-SA,LTE
+   string pcid=5; //NR5G-SA,NR5G-NSA,LTE
+   string tac=6; //NR5G-SA,LTE
+   string arfcn=7; //NR5G-SA,NR5G-NSA
+   string band=8; //NR5G-SA,NR5G-NSA
+   string nr_dl_bandwidth=9; //NR5G-SA
+   string rsrp=10; //NR5G-SA,NR5G-NSA,LTE
+   string rsrq=11; //NR5G-SA,NR5G-NSA,LTE
+   string sinr=12; //NR5G-SA,NR5G-NSA,LTE
+   string tx_power=13; //NR5G-SA,LTE
+   string srxlev=14; //NR5G-SA,LTE
+   string cqi=15; //LTE
+   string earfcn=16; //LTE
+   string freq_band_ind=17; //LTE
+   string ul_bandwidth=18; //LTE
+   string dl_bandwidth=19; //LTE
+   string is_tdd=20; //LTE
+   string rssi=21; //LTE
+   string duplex_mode=22; //NR5G-SA
+   double lng=23;//经度
+   double lat=24;//纬度
+   float height=25;//高度(单位:米)
+   uint32 timestamp=26;//时间戳(单位:秒)
+   uint32 boxstate=27;//1=线缆故障，2=OSDK未激活，3=正常，4=云盒固件更新
+   string isp=28;//运营商
+   int32 tempMax=29;//模组芯片温度(单位:摄氏度)
+   string prx_rsrp=30;//prx路径的rsrp值
+   string drx_rsrp=31;//drx路径的rsrp值
+   string rx2_rsrp=32;//rx2路径的rsrp值
+   string rx3_rsrp=33;//rx3路径的rsrp值
+   string box_sn=34;//云盒编号
+   uint32 sim_use_seat=35;//当前使用的SIM卡在卡槽中的位置：1或2
+   uint32 networkMode=36;//云盒入网方式 1-sim卡 2-网线【自组网或有线网】
+   uint32 delayTime=37;//云盒到平台的通信延迟，单位ms
+}
+
+message SignalList{
+    repeated SignalInfo signalInfo = 1;
+}
+
+//无人机状态对象(0xA8)
+message UavState{
+    FlightControllerState flightControllerState=1;//飞控状态
+    BatteryState batteryState=2;//电池状态
+    PtzState ptzState=3;//云台状态
+    CameraState cameraState=4;//相机状态
+    MissionState missionState=5;//任务状态
+    string boxSn=6;//云盒编号
+    AvoidanceData avoidanceData=7;//避障数据
+    repeated HmsAlarmData hmsAlarmData=8;//Hms报警信息[飞机告警信息]
+    uint64 timestamp=9;//时间戳
+}
+
+message FlightControllerState{
+    uint32 satelliteCount=1;//卫星计数
+    uint32 gpsSignalLevel=2;//GPS信号级别,0~5[4,5等级可以执行航线]
+    uint32 flightMode=3;//飞行模式：1=手动控制模式，2=姿态模式，6=MODE_P_GPS，9=热点任务中，11=自动起飞中，12=降落中，14=航线中，15=返航中，17=虚拟摇杆控制中，33=强制降落中，41=解锁电机准备起飞中
+    uint32 flightStatus=4;//飞行状态:0=电机未启动(地面)，1=电机启动未起飞(地面)，2=起飞在空中(空中)
+    PointData startPoint=5;//起飞点(只包含lat【起飞点纬度】、lng【起飞点经度】、height【起飞点海拔高度】信息)
+    PointData homePoint=6;//返航点(只包含lat【HOME点纬度】、lng【HOME点经度】信息)
+    int32 homeHeight=7;//返航高度(单位:米)
+    uint32 safeLine=8;//打点飞行模式：0=节能模式【飞机直线飞到目标点，需飞机在空中并且有控制权】，1=安全模式【飞机飞行至目标点高度再平飞到目标点，飞机可以在地面】 默认为节能模式
+    uint32 deviceStatus=9;//控制权状态:0=遥控器，1=msdk，4=云盒[此控制权只针对虚拟摇杆控制权，起飞、降落、强制降落、航线操作、返航不需要此控制权，但是遥控器断连情况下，如果云盒没有控制权，飞机会执行遥控器的失联策略]
+    uint32 uwbNodeCount=10;//UWB星数(只有等于4时，才可以开启uwb精准降落模式)
+    string rcMode=11;//遥控器档位模式(说明：1.遥控器与飞机正常连接:(M300:T-P-S/M30:F-S-N/M3:F-N-S)，2.遥控器与飞机未连接:W，3.只有在M300-P挡、M30-N挡、M3-N挡下云盒才能正常控制无人机)    
+    uint32 isEmergencyBrakeing=12;//是否紧急制动中，0=否，1=是 【飞行器在地面限制起飞，飞行器在空中限制飞行.如果想操作飞行,请先解除紧急制动】
+    uint32 outFlyAreaFlag=13;//飞行器是否在所有自定义电子围栏外，0=电子围栏内 1=电子围栏外
+    uint32 inNoFlyAreaFlag=14;//飞行器是否在自定义禁飞区内，0=禁飞区外 1=禁飞区内
+    PointData targetPoint=15;//目标点(打点飞行目标点和航线最后一个航点，只包含lat【目标点纬度】、lng【目标点经度】、height【目标点相对高度】信息)
+    uint32 batteryGohome=16;//自动返航电量
+    uint32 autoLowGohome=17;//是否开启低电量智能返航标志：0-未开启，1=开启【飞机电量小于云盒实时计算的最小返航电量百分比会自动返航】
+    uint32 rcConnected=18;//遥控器与飞机连接状态：0-未连接 1-连接
+}
+
+//电池状态
+message BatteryState{
+    uint32 batteryNum=1;//电池数量
+    string batteryPower=2;//电池电量,多个电池以下划线分割,如：80_60
+    string batteryVoltage=3;//电池电压,多个电池以下划线分割,如：40_30(单位:V)[注意：如果2块电池电压差大于0.7V，飞机限制起飞]
+    BatteryStateInfo firstBatteryInfo=4;//第一块电池状态信息(安装在飞机左边电池槽)
+    BatteryStateInfo secondBatteryInfo=5;//第二块电池状态信息(安装在飞机右边电池槽)
+}
+
+//电池状态信息
+message BatteryStateInfo{
+	uint32 isBatteryEmbed=1;//电池插入飞机状态(注意：如果未插入所有电池信息不可用)：0=插入，1=未插入
+	uint32 batteryCapacityPercent=2;//电池电量百分比
+	int32 currentVoltage=3;//电池电压(单位:mV)
+	int32 currentElectric=4;//当前电池电流(单位:mA)
+	uint32 fullCapacity=5;//满电池容量(单位:mAh)
+	uint32 remainedCapacity=6;//剩余电池容量(单位:mAh)
+	float batteryTemperature=7;//电池温度(单位:摄氏度)
+	uint32 cellCount=8;//电池组数(电池硬件型号有关)
+	uint32 batSOHState=9;//电池循环健康状态：0=正常，1=警报，2=注意安全
+	uint32 sop=10;//相对功率百分比(Relative power percentage)	
+	uint32 heatState=11;//电池加热状态：0=未加热，1=加热中，2=保持恒温
+	uint32 socState=12;//电池SOC荷电状态: 0=SOC正常，1=SOC_ABNORMAL_HIGH，2=SOC_JUMP_DOWN，3=SOC_JUMP_UP，4=SOC_INVALID
+	uint32 selfCheckError=13;//电池自检错误标志(注意：如果此值非0，就是电池损坏需要维修)：0=正常，1=电池自检NTC异常，2=电池自检MOS异常，3=电池自检采样电阻异常，4=电池电芯损坏，5=电池未校准，6=电量计参数异常
+}
+
+//云台状态
+message PtzState{
+    float pitch=1;//俯仰角 范围：-120° ~ 30°
+    float roll=2;//横滚角 范围：-90° ~ 60°
+    float yaw=3;//偏航角  范围：-180° ~ 180°
+    uint32 gimbalMode=4;//云台模式 1=自由模式，2=跟随模式，3=FPV模式
+}
+
+//相机状态
+message CameraState{
+    uint32 mode=1;//相机模式：1=拍照模式，2=录像模式，0=未知
+    uint32 isRecording=2;//是否录制中：1=录制中，0=未录制
+    uint32 recordDuration=3;//录制时长(单位:秒)
+    uint32 source=4;//相机视源：0=可见，1=变焦，2=红外
+    uint32 camera=5;//相机: 0=FPV，1=相机(1)，2=相机(2)
+    float  zoomfactor=6;//相机当前变焦倍数
+    uint32 width=7;//水平像素(例如：1920)
+    uint32 height=8;//垂直像素(例如：1080)
+    uint32 frameRate=9;//帧率(例如：30)
+    uint32 bitstream=10;//码率(单位：0.001)(例如：6兆设置值为6000)
+    uint32 pointThermometrying=11;//单点测温状态：0=非单点测温中，1=单点测温中
+    uint32 areaThermometrying=12;//区域测温状态：0=非区域测温中，1=区域测温中
+    uint32 laserRanging=13;//激光测距状态：0=非激光测距中，1=激光测距中
+    float storePercent=14;//相机TF卡剩余空间百分比
+    uint32 totalPhoto=15;//本次上电已回传图片的总张数
+    uint32 remainedPhoto=16;//未回传图片的剩余张数
+    uint32 sendPhotoOverFlag=17;//图片是否传输完成标志，0：已传完 1：未传完    
+}
+
+//任务状态
+message MissionState{
+	uint32 isPause=1;//航线是否暂停中：0=未暂停，1=暂停中
+	uint32 targetWaypointIndex=2;//目标航点下标(说明：开始成功到第一个航点之间此值为0，到达第一个航点此值为1，到达第二个航点此值为2，以此类推)
+	uint32 isWaypointFinished=3;//是否航点完成：1完成、0未完成(此值废弃)
+	uint32 pushVideo=4;//云盒是否发送视频数据：0=不发送，1=发送
+	uint32 lock4g=5;//是否锁定4G：0=不锁定，1=锁定
+	uint32 boxModel=6;//是否开通图片自动回传功能：0=未开通，1=已开通
+	uint32 mapPlay=7;//自动拍照间隔：0未开始，3~255间隔时间
+	uint32 loseAction=8;//网络失联后动作：0=返回HOME点，1=继续航线
+	uint32 isPointControl=9;//是否打点飞行控制中：0=否，1=是
+	uint32 isUwbLanding=10;//是否UWB精准降落中：0=不是，1=是
+	uint32 isPushVideoing=11;//视频是否推流中：0=不是，1=是
+	uint32 isDLanding=12;//是否二维码精准降落中：0=不是，1=是
+	uint32 perceptionFlag=13;//二维码精准降落模式：0=载荷降落，1=下视降落
+	uint32 isPositionControl=14;//是否指定距离飞行控制中：0=否，1=是
+	uint32 sendImgRtp=15;//是否开启回传图片：0=未开启，1=开启
+	BreakPoint breakPoint=16;//航线断点信息
+}
+
+//航线断点信息
+message BreakPoint{
+    uint32 status=1;//航线断点信息是否有效：0=无效，1=有效
+    uint32 point=2;//航线断点(说明：如航线第2个点和第3个点中间断出航线，此值返回2)
+    double lng=3;//断点经度(说明：此值为航段上退出点的坐标)
+    double lat=4;//断点纬度
+    float height=5;//断点高度(单位:米，范围0~遥控器限高)
+    uint64 taskId=6;//任务编号    
+}
+
+//避障数据
+message AvoidanceData{
+	uint32 downHealth=1;
+	float down=2;//距下障碍物的距离(单位:米),downHealth为1时值有效
+	uint32 frontHealth=3;
+	float front=4;//距前障碍物的距离(单位:米),frontHealth为1时值有效 
+	uint32 rightHealth=5;
+	float right=6;//距右障碍物的距离(单位:米),rightHealth为1时值有效
+	uint32 backHealth=7;
+	float back=8;//距后障碍物的距离(单位:米),backHealth为1时值有效
+	uint32 leftHealth=9;
+	float left=10;//距左障碍物的距离(单位:米),leftHealth为1时值有效
+	uint32 upHealth=11;
+	float up=12;//距上障碍物的距离(单位:米),upHealth为1时值有效
+	uint32 avoidanceEnableStatusDown=13;//下视觉避障开关状态：0-关闭 1-打开
+	uint32 avoidanceEnableStatusUp=14;//上视觉避障开关状态：0-关闭 1-打开
+	uint32 avoidanceEnableStatusHorizontal=15;//水平视觉避障开关状态：0-关闭 1-打开
+}
+
+//Hms报警信息
+message HmsAlarmData{
+	uint32 alarmId=1;//报警信息ID
+	uint32 reportLevel=2;//等级[1/2-警告 3/4/5-错误]
+	string alarmMssInfo=3;//报警信息描述(说明：支持中文/英文/日文/法语，默认中文，如需切换请联系技术支持)
+}
+
+//A8数组(服务端使用)
+message UavStateList{
+    repeated UavState uavStates = 1;
+}
+
+//航线
+message PlanLineData{
+    uint32 finishedAction=1;//结束航线后动作：1=返航，2=原地悬停，3=原地降落，4=原地绕飞[目前只osdk4.1版本支持，中心点为最后一个航点，飞机绕此点画圆飞行]，5=返回至第一个航点并悬停[如果飞机到最后一个点时RC和飞机失联，飞机会在最后一个点悬停]
+    float maxSpeed=2;//最大飞行速度(单位:米/秒，范围0~15)，默认15
+    float autoSpeed=3;//自动飞行速度(单位:米/秒，范围0~15)，默认8
+    repeated PointData points=4;//坐标点数组
+    uint32 loseAction=5;//网络失联后动作：0=返回HOME点，1=继续航线，默认0
+    uint32 homeHeight=6;//返航高度：(单位:米，范围20~1500)，说明：此值为相对起飞点高度，如果太高会有失去网络覆盖风险。不同飞行器返航逻辑不一样，若飞行器距HOME点距离过近，可能不会升高再返航。具体逻辑请咨询大疆DJI
+    uint32 isSaveEnergyMode=7;//是否开启节能模式：0=不是，1=是(说明：谨慎打开节能模式，此模式下飞机沿最短直线距离由起飞点到航线第一个航点，非升高到第一个航点高度再飞往第一个航点，开启此模式需要飞机在空中开始航线。)
+    HangarPoint takePoint=8;//起飞点机库信息
+    HangarPoint landPoint=9;//降落点机库信息
+    repeated PointData interests=10;//兴趣点数组(对象只包含经纬高)
+    NormalModel normalModel=11;//普通建模
+    SurroundModel surroundModel=12;//环绕建模
+    PointData takeOffPoint=13;//起飞点(对象只包含经纬高)
+    uint32 securityHeight=14;//安全起飞高度：(单位:米，范围20~1500)
+    uint32 templateId = 15;//航线模板编号,非模板航线时传0 
+}
+
+//航线点
+message PointData{
+    double lng=1;//经度
+    double lat=2;//纬度
+    float height=3;//高度(单位:米，范围0~遥控器限高)，说明：PointData属性作为航线点时此值为相对起飞点高度，PointData属性作为起飞点时此值为起飞点海拔高度
+    float speed=4;//速度(单位:米/秒，范围0~15)，默认8
+    repeated PointAction actions=5;//动作数组
+    uint32 flightPathMode=6;//航线飞行模式：1=直线飞行，2=协调转弯，3=曲线飞行(停)，4=曲线飞行(不停)
+    float dampingDistance=7;//转弯半径(仅协调转弯模式下有效)，取值范围1~655.35单位:米，两点间距离要小于此值，此值要根据实际情况计算，切勿随便设此值[可能导致航线开始失败]，具体计算方法可以咨询售后支持或者大疆DJI
+    uint32 safeGohomeFlag=8;//是否为安全返航点 0=不是，1=是 (暂时未启用)
+    uint32 headingMode=9;//偏航模式 0=自动，1=锁定，2=遥控器控制，3=机头依照航点偏航设置方向旋转，4=朝向兴趣点，5=飞机和云台的偏航同时旋转
+    float heading=10;//航点偏航 -180~180
+    int32 interestIndex=11;//兴趣点ID
+    uint32 groupIndex=12;//组下标
+}
+
+//航线点动作
+message PointAction{
+    uint32 type=1;//类型：1.变焦 2.拍照 3.录像 4.停录 5.控制飞机机头偏航 6.控制云台俯仰 7.控制云台偏航 8.控制云台横滚 9.悬停 10.等距间隔拍照 11.等时间隔拍照 12.结束间隔拍照 13.单条喊话 14.开始循环喊话 15.结束循环喊话 16.对焦 17.切换视频源
+    float param=2;//参数：[1.变焦]->变焦倍数(范围：2~200) 、[2.拍照 除M300/M350外飞机航线可以设置拍照类型]->(1-广角 2-变焦 3-红外 4-广角+变焦 5-广角+红外 6-变焦+红外 7-广角+变焦+红外)、 [5.控制飞机机头偏航(范围：-180~180)、6.控制云台俯仰(范围：-120~30)、7.控制云台偏航(范围：-180~180)、8.控制云台横滚(范围：-90~60)]->角度(按正北坐标系绝对值控制) 、[9.悬停]->时间(单位:秒,范围:1~25,如果想停留大于25秒时长,可以加多组悬停动作) [10.等距间隔拍照]->距离(单位:米,范围:1~100)  [11.等时间隔拍照]->时间(单位:秒,范围:1~30)  [17.切换视频源->1-广角 2-变焦 3-红外]
+    int32 waitTime=3;//动作触发后等待时长(单位:秒) [此值如果不需要可以不传，如需悬停可添加类型9悬停动作]
+    string speakInfo=4;//音量_类型_喊话内容[type=13和type=14时生效] ,格式为：byte[0]=,byte[N]=内容
+}
+
+//机库信息
+message HangarPoint{
+    string hangarId=1;//机库ID
+    double hangarLng=2;//机库经度
+    double hangarLat=3;//机库纬度
+    double alternateLng=4;//备降点经度
+    double alternateLat=5;//备降点纬度
+    uint32 mediaUploadFlag=6;//飞机回仓后是否等待所有媒体文件传完再关仓：0-立即关仓 1-等待传完后关仓
+}
+
+//普通建模
+message NormalModel{
+   repeated PointData area=1;//作业区域
+   uint32 serviceId=2;//建模平台编号:1=瞰景，2=大势，默认1
+   uint32 cameraId=3;//相机编号
+   uint32 isModeling=4;//是否实时建模：0=不，1=是
+   uint32 mode=5;//作业模式：1=倾斜，2=正摄
+   uint32 hOverlap=6;//横向重叠率
+   uint32 vOverlap=7;//纵向重叠率
+   uint32 mirror=8;//正反：1：正，2=反
+   uint32 direction=9;//方向：1=南北，2=东西
+   uint32 flightPathMode=10;//航线飞行模式：1=直线飞行，2=协调转弯
+   uint32 height=11;//测绘高度(单位:米，范围20~1500)
+   uint32 pitch=12;//俯仰角(范围-30~-80)
+}
+
+//环绕建模
+message SurroundModel{
+   repeated PointData area=1;//作业区域
+   uint32 serviceId=2;//建模平台编号:1=瞰景，2=天宇
+   uint32 cameraId=3;//相机编号
+   uint32 isModeling=4;//是否实时建模：0=不，1=是
+   uint32 height=5;//测绘高度(单位:米，范围20~1500)
+   repeated PointData boundary=6;//边界区域
+   uint32 exposureCount=7;//曝光点数(范围12、16、20、24)
+}
+
+//无人机初始化详情(服务端使用)
+message UavInitInfo{
+    string uavModel=1;//无人机型号	
+    string uavSn=2;//无人机SN
+    string uavVersion=3;//无人机固件版本号
+    string ptModel=4;//挂载相机型号	
+    string ptVersion=5;//挂载相机固件版本号
+    uint32 ptPosition=6;//挂载相机psdk口位置
+    string moduleVersion=7;//模组固件版本号
+}
+
+
+
+//第三方负载状态信息,指令编号0xAA
+message PayloadState{
+    StickState stickState=1;//1808算力棒状态信息
+    ParachuteState parachuteState=2;//小域降落伞状态信息
+    SprayFireState sprayFireState=3;//喷火器状态信息
+    AirAnalysis airAnalysis=4;//气体检测
+    string boxSn=5;
+    uint64 timestamp=6;//时间戳,精确到毫秒
+}
+
+//AA数组(服务端使用)
+message PayloadStateList{
+    repeated PayloadState payloadState = 1;
+}
+
+//1808算力棒状态信息
+message StickState{
+	uint32 id=1;//设备ID
+	uint32 position=2;//挂载位置：1-psdk1 2-psdk2 3-psdk3 4-usb1 5-usb2
+	string stickId=3;//1808算力棒唯一编号
+	uint32 openAiFlag=4;//AI开启标志 0：未开启 1：开启
+	uint32 openAiPhotoReport=5;//AI结果是否上报图片 0：未开启 1：开启
+	string modelSn=6;//当前加载模型唯一编号
+	float prob=7;//可信度阈值
+	repeated string tags=8;//识别标签状态 格式为:0-car 1-person 1-bicycle [0为未识别，1为识别中]
+}
+
+//小域降落伞状态信息
+message ParachuteState{
+   uint32 id=1;//设备ID
+   uint32 position=2;//挂载位置：1-psdk1 2-psdk2 3-psdk3 4-usb1 5-usb2
+   uint32 connectStatus=3;//降落伞连接状态 0：未连接 1：已连接
+   uint32 isOpenFlag=4;//降落伞开启状态 0：未开伞 1：已开启
+}
+
+//喷火器状态信息
+message SprayFireState{
+	uint32 id=1;//设备ID
+	uint32 position=2;//挂载位置：1-psdk1 2-psdk2 3-psdk3 4-usb1 5-usb2
+	uint32 sprayState=3;//喷火开关状态 0：关闭 1：打开
+	uint32 fuelState=4;//喷燃料开关状态 0：关闭 1：打开
+	uint32 ignitionState=5;//点火开关状态 0：关闭 1：打开
+	uint32 lockState=6;//解锁状态 0：关闭 1：打开
+	uint32 gear=7;//档位 0-无档位、1-1挡、2-2挡、3-3挡
+	uint32 laserState=8;//激光开关状态 0：关闭 1：打开
+	uint32 pressState=9;//加压状态 0：未加压 1：加压中
+	uint32 fireTime=10;//喷火时间[单位：秒]
+	uint32 extendRc=11;//扩展遥控连接状态 0：关闭 1：打开
+	uint32 claspState=12;//卡扣状态 0：未到位 1：已到位
+	uint32 yaw=13;//喷火头偏航角度值[范围0~100]
+	uint32 pitch=14;//喷火头俯仰角度值[范围0~100]	
+}
+
+//气体检测数据
+message AirAnalysis{
+	string sn=1;//设备编号
+	uint32 sat=2;//卫星数
+	double lng=3;//经度
+        double lat=4;//纬度
+	float height=5;//相对高度
+	float pm25=6;//PM2.5,单位:ug/m3
+	float pm10=7;//PM10,单位:ug/m3
+	float so2=8;//SO2,单位:ug/m3
+	float co=9;//Co,单位:mg/m3
+	float no2=10;//NO2,单位:ug/m3
+	float o3=11;//O3,单位:ug/m3
+	float temp=12;//温度,单位:度
+	float hum=13;//湿度,单位RH%
+}
